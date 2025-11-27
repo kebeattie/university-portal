@@ -3,6 +3,49 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to University Portal</h1>
+    <p class="lead">Your gateway to managing courses and enrollments</p>
+    
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="mt-4">
+            @if (User.IsInRole("Admin"))
+            {
+                <h3>Admin Dashboard</h3>
+                <p>You have administrative access to manage courses and students.</p>
+                <a asp-controller="Admin" asp-action="Index" class="btn btn-primary btn-lg">Go to Dashboard</a>
+            }
+            else if (User.IsInRole("Student"))
+            {
+                <h3>Student Portal</h3>
+                <p>Browse available courses and manage your enrollments.</p>
+                <a asp-controller="Courses" asp-action="Index" class="btn btn-primary btn-lg">Browse Courses</a>
+                <a asp-controller="Enrollments" asp-action="MyEnrollments" class="btn btn-outline-primary btn-lg">My Enrollments</a>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <h4>Complete Your Profile</h4>
+                    <p>Please contact an administrator to assign you a role.</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="mt-4">
+            <p>Please sign in to access the portal.</p>
+            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg">Sign In</a>
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary btn-lg">Register</a>
+        </div>
+        
+        <div class="mt-5">
+            <h4>Demo Account</h4>
+            <div class="alert alert-info">
+                <strong>Admin Account:</strong><br/>
+                Email: admin@university.com<br/>
+                Password: Admin@123
+            </div>
+        </div>
+    }
 </div>
