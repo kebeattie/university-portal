@@ -1,0 +1,150 @@
+@model UniversityPortal.Models.Course
+
+@{
+    ViewData["Title"] = "Course Details";
+}
+
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Courses</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.CourseCode</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2>@Model.CourseName</h2>
+                    <h5 class="mb-0">@Model.CourseCode</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Instructor:</strong> @Model.Instructor</p>
+                            <p><strong>Credits:</strong> @Model.Credits</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Maximum Students:</strong> @Model.MaxStudents</p>
+                            <p><strong>Currently Enrolled:</strong> @Model.CurrentEnrolled</p>
+                            <p>
+                                <strong>Status:</strong> 
+                                @if (Model.CurrentEnrolled < Model.MaxStudents)
+                                {
+                                    <span class="badge bg-success">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Full</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h4>Course Description</h4>
+                    <p>@(string.IsNullOrEmpty(Model.Description) ? "No description available." : Model.Description)</p>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <hr />
+                        <h4>Enrolled Students (@Model.Enrollments.Count(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled))</h4>
+                        
+                        @if (Model.Enrollments.Any(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled))
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Student Number</th>
+                                            <th>Enrollment Date</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var enrollment in Model.Enrollments.Where(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled))
+                                        {
+                                            <tr>
+                                                <td>@enrollment.Student.FirstName @enrollment.Student.LastName</td>
+                                                <td>@enrollment.Student.StudentNumber</td>
+                                                <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
+                                                <td>@(enrollment.Grade?.ToString("F1") ?? "N/A")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No students currently enrolled.</p>
+                        }
+                    }
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Index" class="btn btn-secondary">Back to Courses</a>
+                    
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="EditCourse" asp-route-id="@Model.Id" 
+                           class="btn btn-warning">Edit Course</a>
+                        <a asp-controller="Admin" asp-action="DeleteCourse" asp-route-id="@Model.Id" 
+                           class="btn btn-danger">Delete Course</a>
+                    }
+                    else if (User.IsInRole("Student") && Model.CurrentEnrolled < Model.MaxStudents)
+                    {
+                        <a asp-controller="Enrollments" asp-action="Enroll" asp-route-courseId="@Model.Id" 
+                           class="btn btn-primary">Enroll in this Course</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Course Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Capacity</h6>
+                        <div class="progress" style="height: 25px;">
+                            @{
+                                var percentage = Model.MaxStudents > 0 ? (Model.CurrentEnrolled * 100.0 / Model.MaxStudents) : 0;
+                                var progressClass = percentage < 70 ? "bg-success" : percentage < 90 ? "bg-warning" : "bg-danger";
+                            }
+                            <div class="progress-bar @progressClass" role="progressbar" 
+                                 style="width: @percentage%" 
+                                 aria-valuenow="@Model.CurrentEnrolled" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="@Model.MaxStudents">
+                                @percentage.ToString("F0")%
+                            </div>
+                        </div>
+                        <small class="text-muted">@Model.CurrentEnrolled of @Model.MaxStudents seats filled</small>
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-2">
+                        <small class="text-muted">Course Code</small>
+                        <p class="mb-1"><strong>@Model.CourseCode</strong></p>
+                    </div>
+
+                    <div class="mb-2">
+                        <small class="text-muted">Credit Hours</small>
+                        <p class="mb-1"><strong>@Model.Credits</strong></p>
+                    </div>
+
+                    <div class="mb-2">
+                        <small class="text-muted">Instructor</small>
+                        <p class="mb-1"><strong>@Model.Instructor</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

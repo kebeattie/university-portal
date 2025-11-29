@@ -1,0 +1,102 @@
+@model IEnumerable<UniversityPortal.Models.Enrollment>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var stats = ViewBag.Stats;
+}
+
+<div class="container">
+    <h1>Admin Dashboard</h1>
+    <p class="lead">Manage courses, students, and enrollments</p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Courses</h5>
+                    <h2 class="card-text">@stats.TotalCourses</h2>
+                    <small>@stats.ActiveCourses active</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Students</h5>
+                    <h2 class="card-text">@stats.TotalStudents</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Active Enrollments</h5>
+                    <h2 class="card-text">@stats.TotalEnrollments</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <a asp-action="CreateCourse" class="btn btn-light btn-sm mt-2">Add Course</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Enrollments</h5>
+                    <a asp-controller="Courses" asp-action="Index" class="btn btn-sm btn-outline-primary">View All Courses</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Student</th>
+                                        <th>Course</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var enrollment in Model)
+                                    {
+                                        <tr>
+                                            <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
+                                            <td>@enrollment.Student.FirstName @enrollment.Student.LastName</td>
+                                            <td>@enrollment.Course.CourseCode - @enrollment.Course.CourseName</td>
+                                            <td>
+                                                <span class="badge bg-@(enrollment.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled ? "success" : "secondary")">
+                                                    @enrollment.Status
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No enrollments yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

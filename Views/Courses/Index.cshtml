@@ -1,0 +1,105 @@
+@model IEnumerable<UniversityPortal.Models.Course>
+
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<div class="container">
+    <h1>Available Courses</h1>
+    <p class="lead">Browse and explore our course catalog</p>
+
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <form asp-action="Index" method="get">
+                <div class="input-group">
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" 
+                           class="form-control" placeholder="Search by course code, name, or instructor..." />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Admin" asp-action="CreateCourse" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Add New Course
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a asp-action="Index" asp-route-sortOrder="@ViewData["CodeSortParam"]" 
+                                   asp-route-searchString="@ViewData["CurrentFilter"]">
+                                    Course Code
+                                </a>
+                            </th>
+                            <th>
+                                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParam"]" 
+                                   asp-route-searchString="@ViewData["CurrentFilter"]">
+                                    Course Name
+                                </a>
+                            </th>
+                            <th>Instructor</th>
+                            <th>
+                                <a asp-action="Index" asp-route-sortOrder="@ViewData["CreditsSortParam"]" 
+                                   asp-route-searchString="@ViewData["CurrentFilter"]">
+                                    Credits
+                                </a>
+                            </th>
+                            <th>Availability</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var course in Model)
+                        {
+                            <tr>
+                                <td><strong>@course.CourseCode</strong></td>
+                                <td>@course.CourseName</td>
+                                <td>@course.Instructor</td>
+                                <td>@course.Credits</td>
+                                <td>
+                                    <span class="badge @(course.CurrentEnrolled < course.MaxStudents ? "bg-success" : "bg-danger")">
+                                        @course.CurrentEnrolled / @course.MaxStudents
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@course.Id" class="btn btn-sm btn-outline-primary">
+                                        View Details
+                                    </a>
+                                    @if (User.IsInRole("Student") && course.CurrentEnrolled < course.MaxStudents)
+                                    {
+                                        <a asp-controller="Enrollments" asp-action="Enroll" asp-route-courseId="@course.Id" 
+                                           class="btn btn-sm btn-primary">
+                                            Enroll
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center">
+                    <h4>No courses found</h4>
+                    <p>@(string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()) ? 
+                        "There are no courses available at the moment." : 
+                        "No courses match your search criteria. Try a different search term.")</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

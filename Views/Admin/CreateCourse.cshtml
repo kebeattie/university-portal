@@ -1,0 +1,88 @@
+@model UniversityPortal.Models.Course
+
+@{
+    ViewData["Title"] = "Create Course";
+}
+
+<div class="container">
+    <h1>Create New Course</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="CreateCourse">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="CourseCode" class="form-label"></label>
+                            <input asp-for="CourseCode" class="form-control" placeholder="e.g., CS101" />
+                            <span asp-validation-for="CourseCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CourseName" class="form-label"></label>
+                            <input asp-for="CourseName" class="form-control" placeholder="e.g., Introduction to Computer Science" />
+                            <span asp-validation-for="CourseName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4" 
+                                      placeholder="Provide a detailed description of the course..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Credits" class="form-label"></label>
+                                <input asp-for="Credits" class="form-control" type="number" min="1" max="10" />
+                                <span asp-validation-for="Credits" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaxStudents" class="form-label"></label>
+                                <input asp-for="MaxStudents" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="MaxStudents" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Instructor" class="form-label"></label>
+                            <input asp-for="Instructor" class="form-control" placeholder="e.g., Dr. Smith" />
+                            <span asp-validation-for="Instructor" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="IsActive" class="form-check-label"></label>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Create Course</button>
+                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5>Tips</h5>
+                    <ul>
+                        <li>Course codes should be unique</li>
+                        <li>Credits typically range from 1-10</li>
+                        <li>Set appropriate maximum student limits</li>
+                        <li>Inactive courses won't appear in student listings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
