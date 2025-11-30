@@ -29,16 +29,23 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
+        logger.LogInformation("Starting database seeding...");
         await DbSeeder.SeedRolesAndAdminAsync(services);
         var context = services.GetRequiredService<ApplicationDbContext>();
         await DbSeeder.SeedSampleDataAsync(context);
+        logger.LogInformation("Database seeding completed successfully.");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogError(ex, "An error occurred while seeding the database. Error: {Message}", ex.Message);
+        // Don't throw in production, just log the error
+        if (!app.Environment.IsProduction())
+        {
+            throw;
+        }
     }
 }
 
@@ -53,10 +60,21 @@ else
     app.UseHsts();
     
     // Apply migrations automatically in production
-    using (var scope = app.Services.CreateScope())
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    try
     {
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
+        logger.LogInformation("Applying database migrations...");
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            context.Database.Migrate();
+            logger.LogInformation("Database migrations applied successfully.");
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to apply migrations. Error: {Message}", ex.Message);
+        throw;
     }
 }
 
