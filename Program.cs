@@ -9,9 +9,13 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "5006";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Use environment-specific database path
+var dbPath = builder.Environment.IsProduction() 
+    ? "Data Source=/app/publish/app.db;Cache=Shared"
+    : builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseSqlite(dbPath));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
