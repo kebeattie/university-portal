@@ -6,7 +6,7 @@ nixPkgs = ['dotnet-sdk_8', 'sqlite']
 cmds = ['dotnet restore UniversityPortal.csproj']
 
 [phases.build]
-cmds = ['dotnet publish UniversityPortal.csproj -c Release -o out']
+cmds = ['dotnet publish UniversityPortal.csproj -c Release -o /app/out']
 
 [start]
-cmd = 'dotnet ./out/UniversityPortal.dll --urls=http://0.0.0.0:$PORT'
+cmd = 'dotnet /app/out/UniversityPortal.dll --urls=http://0.0.0.0:$PORT'
