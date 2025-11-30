@@ -9,4 +9,4 @@ cmds = ['dotnet restore UniversityPortal.csproj']
 cmds = ['dotnet publish UniversityPortal.csproj -c Release -o out']
 
 [start]
-cmd = 'dotnet out/UniversityPortal.dll --urls=http://0.0.0.0:$PORT'
+cmd = 'dotnet ./out/UniversityPortal.dll --urls=http://0.0.0.0:$PORT'
