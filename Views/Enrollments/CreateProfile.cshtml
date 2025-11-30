@@ -1,0 +1,79 @@
+@model UniversityPortal.Models.Student
+
+@{
+    ViewData["Title"] = "Create Student Profile";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2>Create Your Student Profile</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Please complete your student profile to start enrolling in courses.</p>
+                    
+                    <form asp-action="CreateProfile">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label"></label>
+                                <input asp-for="FirstName" class="form-control" placeholder="John" required />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label"></label>
+                                <input asp-for="LastName" class="form-control" placeholder="Doe" required />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="StudentNumber" class="form-label"></label>
+                            <input asp-for="StudentNumber" class="form-control" placeholder="e.g., S2025001" required />
+                            <span asp-validation-for="StudentNumber" class="text-danger"></span>
+                            <small class="text-muted">This must be unique. Use format: S followed by numbers (e.g., S2025001)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateOfBirth" class="form-label"></label>
+                            <input asp-for="DateOfBirth" class="form-control" type="date" required />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Major" class="form-label"></label>
+                            <input asp-for="Major" class="form-control" placeholder="e.g., Computer Science" required />
+                            <span asp-validation-for="Major" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Create Profile</button>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3 bg-light">
+                <div class="card-body">
+                    <h5>What's Next?</h5>
+                    <p>After creating your profile, you'll be able to:</p>
+                    <ul>
+                        <li>Browse available courses</li>
+                        <li>Enroll in courses</li>
+                        <li>View your enrollment history</li>
+                        <li>Track your academic progress</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

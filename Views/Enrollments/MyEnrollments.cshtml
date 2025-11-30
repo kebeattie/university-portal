@@ -1,0 +1,166 @@
+@model UniversityPortal.Models.Student
+
+@{
+    ViewData["Title"] = "My Enrollments";
+}
+
+<div class="container">
+    <h1>My Enrollments</h1>
+    <p class="lead">Welcome, @Model.FirstName @Model.LastName</p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Student Information</h5>
+                    <p><strong>Student Number:</strong> @Model.StudentNumber</p>
+                    <p><strong>Major:</strong> @Model.Major</p>
+                    <p><strong>Enrollment Date:</strong> @Model.EnrollmentDate.ToShortDateString()</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Enrollments</h5>
+                    <h2>@Model.Enrollments.Count(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled)</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Credits</h5>
+                    <h2>@Model.Enrollments.Where(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled).Sum(e => e.Course.Credits)</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">My Courses</h5>
+            <a asp-controller="Courses" asp-action="Index" class="btn btn-primary btn-sm">Browse Courses</a>
+        </div>
+        <div class="card-body">
+            @{
+                var activeEnrollments = Model.Enrollments.Where(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled).ToList();
+            }
+
+            @if (activeEnrollments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Name</th>
+                                <th>Instructor</th>
+                                <th>Credits</th>
+                                <th>Enrolled Date</th>
+                                <th>Grade</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var enrollment in activeEnrollments)
+                            {
+                                <tr>
+                                    <td><strong>@enrollment.Course.CourseCode</strong></td>
+                                    <td>@enrollment.Course.CourseName</td>
+                                    <td>@enrollment.Course.Instructor</td>
+                                    <td>@enrollment.Course.Credits</td>
+                                    <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
+                                    <td>
+                                        @if (enrollment.Grade.HasValue)
+                                        {
+                                            <span class="badge bg-info">@enrollment.Grade.Value.ToString("F1")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">In Progress</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Courses" asp-action="Details" asp-route-id="@enrollment.Course.Id" 
+                                           class="btn btn-sm btn-outline-primary">View</a>
+                                        <form asp-action="Drop" asp-route-id="@enrollment.Id" method="post" 
+                                              style="display:inline;" 
+                                              onsubmit="return confirm('Are you sure you want to drop this course?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-danger">Drop</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <h4>No Active Enrollments</h4>
+                    <p class="text-muted">You haven't enrolled in any courses yet.</p>
+                    <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Browse Available Courses</a>
+                </div>
+            }
+        </div>
+    </div>
+
+    @{
+        var pastEnrollments = Model.Enrollments.Where(e => e.Status != UniversityPortal.Models.EnrollmentStatus.Enrolled).ToList();
+    }
+
+    @if (pastEnrollments.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Enrollment History</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Status</th>
+                                <th>Grade</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var enrollment in pastEnrollments)
+                            {
+                                <tr>
+                                    <td>@enrollment.Course.CourseCode - @enrollment.Course.CourseName</td>
+                                    <td>
+                                        <span class="badge bg-secondary">@enrollment.Status</span>
+                                    </td>
+                                    <td>@(enrollment.Grade?.ToString("F1") ?? "N/A")</td>
+                                    <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

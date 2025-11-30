@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Enroll in Course";
+    var course = ViewBag.Course as UniversityPortal.Models.Course;
+    var student = ViewBag.Student as UniversityPortal.Models.Student;
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Courses" asp-action="Index">Courses</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Courses" asp-action="Details" asp-route-id="@course.Id">@course.CourseCode</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Enroll</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2>Confirm Enrollment</h2>
+                </div>
+                <div class="card-body">
+                    <h4>Course Information</h4>
+                    <dl class="row">
+                        <dt class="col-sm-4">Course Code</dt>
+                        <dd class="col-sm-8">@course.CourseCode</dd>
+
+                        <dt class="col-sm-4">Course Name</dt>
+                        <dd class="col-sm-8">@course.CourseName</dd>
+
+                        <dt class="col-sm-4">Instructor</dt>
+                        <dd class="col-sm-8">@course.Instructor</dd>
+
+                        <dt class="col-sm-4">Credits</dt>
+                        <dd class="col-sm-8">@course.Credits</dd>
+
+                        <dt class="col-sm-4">Availability</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-success">@course.CurrentEnrolled / @course.MaxStudents students enrolled</span>
+                        </dd>
+                    </dl>
+
+                    <hr />
+
+                    <h4>Student Information</h4>
+                    <dl class="row">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">@student.FirstName @student.LastName</dd>
+
+                        <dt class="col-sm-4">Student Number</dt>
+                        <dd class="col-sm-8">@student.StudentNumber</dd>
+
+                        <dt class="col-sm-4">Major</dt>
+                        <dd class="col-sm-8">@student.Major</dd>
+                    </dl>
+
+                    <hr />
+
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> By confirming, you will be officially enrolled in this course. 
+                        You can drop the course later from your enrollments page if needed.
+                    </div>
+
+                    <form asp-action="Enroll" method="post">
+                        <input type="hidden" name="courseId" value="@course.Id" />
+                        @Html.AntiForgeryToken()
+                        
+                        <button type="submit" class="btn btn-primary btn-lg">Confirm Enrollment</button>
+                        <a asp-controller="Courses" asp-action="Details" asp-route-id="@course.Id" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
