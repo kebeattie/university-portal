@@ -2,26 +2,35 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UniversityPortal.Data;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Configure Kestrel to use PORT environment variable (for Railway deployment)
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5006";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-
-// Add services to the container.
-// Use environment-specific database path
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "DataSource=app.db;Cache=Shared";
+try
+{
+    Console.WriteLine("Starting application...");
     
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddControllersWithViews();
+    Console.WriteLine("Configuring services...");
+    
+    // Configure Kestrel to use PORT environment variable (for Railway deployment)
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "5006";
+    Console.WriteLine($"Using port: {port}");
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-var app = builder.Build();
+    // Add services to the container.
+    // Use environment-specific database path
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "DataSource=app.db;Cache=Shared";
+    Console.WriteLine($"Connection string: {connectionString}");
+    
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite(connectionString));
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+    builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>();
+    builder.Services.AddControllersWithViews();
+
+    Console.WriteLine("Building application...");
+    var app = builder.Build();
 
 // Seed database with roles and admin user
 using (var scope = app.Services.CreateScope())
@@ -92,4 +101,17 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
+Console.WriteLine("Starting web server...");
 app.Run();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FATAL ERROR: {ex.GetType().Name}");
+    Console.WriteLine($"Message: {ex.Message}");
+    Console.WriteLine($"Stack: {ex.StackTrace}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner: {ex.InnerException.Message}");
+    }
+    throw;
+}
