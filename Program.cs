@@ -4,6 +4,10 @@ using UniversityPortal.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel to use PORT environment variable (for Railway deployment)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5006";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -42,11 +46,21 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    
+    // Apply migrations automatically in production
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+    }
 }
 
-app.UseHttpsRedirection();
+// Don't force HTTPS redirection in production (Railway handles SSL)
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 
 app.UseRouting();
