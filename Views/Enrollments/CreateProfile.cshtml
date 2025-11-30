@@ -14,7 +14,9 @@
                 <div class="card-body">
                     <p class="lead">Please complete your student profile to start enrolling in courses.</p>
                     
-                    <form asp-action="CreateProfile">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    
+                    <form asp-action="CreateProfile" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         
                         <div class="row">
@@ -45,9 +47,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Major" class="form-label"></label>
-                            <input asp-for="Major" class="form-control" placeholder="e.g., Computer Science" required />
-                            <span asp-validation-for="Major" class="text-danger"></span>
+                            <label asp-for="Programme" class="form-label"></label>
+                            <input asp-for="Programme" class="form-control" placeholder="e.g., Computer Science" required />
+                            <span asp-validation-for="Programme" class="text-danger"></span>
                         </div>
 
                         <div class="mt-4">

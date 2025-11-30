@@ -50,9 +50,9 @@
                     @if (User.IsInRole("Admin"))
                     {
                         <hr />
-                        <h4>Enrolled Students (@Model.Enrollments.Count(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled))</h4>
+                        <h4>Enrolled Students (@Model.Enrolments.Count(e => e.Status == UniversityPortal.Models.EnrolmentStatus.Enrolled))</h4>
                         
-                        @if (Model.Enrollments.Any(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled))
+                        @if (Model.Enrolments.Any(e => e.Status == UniversityPortal.Models.EnrolmentStatus.Enrolled))
                         {
                             <div class="table-responsive">
                                 <table class="table table-sm">
@@ -60,18 +60,18 @@
                                         <tr>
                                             <th>Student Name</th>
                                             <th>Student Number</th>
-                                            <th>Enrollment Date</th>
+                                            <th>Enrolment Date</th>
                                             <th>Grade</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var enrollment in Model.Enrollments.Where(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled))
+                                        @foreach (var enrolment in Model.Enrolments.Where(e => e.Status == UniversityPortal.Models.EnrolmentStatus.Enrolled))
                                         {
                                             <tr>
-                                                <td>@enrollment.Student.FirstName @enrollment.Student.LastName</td>
-                                                <td>@enrollment.Student.StudentNumber</td>
-                                                <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
-                                                <td>@(enrollment.Grade?.ToString("F1") ?? "N/A")</td>
+                                                <td>@enrolment.Student.FirstName @enrolment.Student.LastName</td>
+                                                <td>@enrolment.Student.StudentNumber</td>
+                                                <td>@enrolment.EnrolmentDate.ToShortDateString()</td>
+                                                <td>@(enrolment.Grade?.ToString("F1") ?? "N/A")</td>
                                             </tr>
                                         }
                                     </tbody>

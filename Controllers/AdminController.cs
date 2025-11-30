@@ -24,19 +24,19 @@ public class AdminController : Controller
             TotalCourses = await _context.Courses.CountAsync(),
             ActiveCourses = await _context.Courses.CountAsync(c => c.IsActive),
             TotalStudents = await _context.Students.CountAsync(),
-            TotalEnrollments = await _context.Enrollments.CountAsync(e => e.Status == EnrollmentStatus.Enrolled)
+            TotalEnrolments = await _context.Enrolments.CountAsync(e => e.Status == EnrolmentStatus.Enrolled)
         };
 
         ViewBag.Stats = stats;
 
-        var recentEnrollments = await _context.Enrollments
+        var recentEnrolments = await _context.Enrolments
             .Include(e => e.Student)
             .Include(e => e.Course)
-            .OrderByDescending(e => e.EnrollmentDate)
+            .OrderByDescending(e => e.EnrolmentDate)
             .Take(10)
             .ToListAsync();
 
-        return View(recentEnrollments);
+        return View(recentEnrolments);
     }
 
     // GET: Admin/CreateCourse
@@ -120,7 +120,7 @@ public class AdminController : Controller
         }
 
         var course = await _context.Courses
-            .Include(c => c.Enrollments)
+            .Include(c => c.Enrolments)
             .FirstOrDefaultAsync(m => m.Id == id);
         if (course == null)
         {

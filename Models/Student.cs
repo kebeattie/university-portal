@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace UniversityPortal.Models;
 
@@ -7,7 +8,6 @@ public class Student
 {
     public int Id { get; set; }
 
-    [Required]
     public string UserId { get; set; } = string.Empty;
 
     [Required]
@@ -30,12 +30,15 @@ public class Student
     public DateTime DateOfBirth { get; set; }
 
     [StringLength(100)]
-    public string Major { get; set; } = string.Empty;
+    public string Programme { get; set; } = string.Empty;
 
-    [Display(Name = "Enrollment Date")]
-    public DateTime EnrollmentDate { get; set; } = DateTime.Now;
+    [Display(Name = "Enrolment Date")]
+    public DateTime EnrolmentDate { get; set; } = DateTime.Now;
 
     // Navigation properties
+    [ValidateNever]
     public IdentityUser User { get; set; } = null!;
-    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+    
+    [ValidateNever]
+    public ICollection<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
 }

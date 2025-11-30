@@ -1,4 +1,4 @@
-@model IEnumerable<UniversityPortal.Models.Enrollment>
+@model IEnumerable<UniversityPortal.Models.Enrolment>
 
 @{
     ViewData["Title"] = "Admin Dashboard";
@@ -38,8 +38,8 @@
         <div class="col-md-3">
             <div class="card text-white bg-info">
                 <div class="card-body">
-                    <h5 class="card-title">Active Enrollments</h5>
-                    <h2 class="card-text">@stats.TotalEnrollments</h2>
+                    <h5 class="card-title">Active Enrolments</h5>
+                    <h2 class="card-text">@stats.TotalEnrolments</h2>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Recent Enrollments</h5>
+                    <h5 class="mb-0">Recent Enrolments</h5>
                     <a asp-controller="Courses" asp-action="Index" class="btn btn-sm btn-outline-primary">View All Courses</a>
                 </div>
                 <div class="card-body">
@@ -74,15 +74,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var enrollment in Model)
+                                    @foreach (var enrolment in Model)
                                     {
                                         <tr>
-                                            <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
-                                            <td>@enrollment.Student.FirstName @enrollment.Student.LastName</td>
-                                            <td>@enrollment.Course.CourseCode - @enrollment.Course.CourseName</td>
+                                            <td>@enrolment.EnrolmentDate.ToShortDateString()</td>
+                                            <td>@enrolment.Student.FirstName @enrolment.Student.LastName</td>
+                                            <td>@enrolment.Course.CourseCode - @enrolment.Course.CourseName</td>
                                             <td>
-                                                <span class="badge bg-@(enrollment.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled ? "success" : "secondary")">
-                                                    @enrollment.Status
+                                                <span class="badge bg-@(enrolment.Status == UniversityPortal.Models.EnrolmentStatus.Enrolled ? "success" : "secondary")">
+                                                    @enrolment.Status
                                                 </span>
                                             </td>
                                         </tr>
@@ -93,7 +93,7 @@
                     }
                     else
                     {
-                        <p class="text-muted">No enrollments yet.</p>
+                        <p class="text-muted">No enrolments yet.</p>
                     }
                 </div>
             </div>

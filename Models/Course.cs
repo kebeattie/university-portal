@@ -35,5 +35,5 @@ public class Course
     public bool IsActive { get; set; } = true;
 
     // Navigation property
-    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+    public ICollection<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
 }

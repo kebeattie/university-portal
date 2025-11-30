@@ -2,15 +2,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace UniversityPortal.Models;
 
-public enum EnrollmentStatus
+public enum EnrolmentStatus
 {
     Enrolled,
     Completed,
-    Dropped,
+    Withdrawn,
     Failed
 }
 
-public class Enrollment
+public class Enrolment
 {
     public int Id { get; set; }
 
@@ -20,10 +20,10 @@ public class Enrollment
     [Required]
     public int CourseId { get; set; }
 
-    [Display(Name = "Enrollment Date")]
-    public DateTime EnrollmentDate { get; set; } = DateTime.Now;
+    [Display(Name = "Enrolment Date")]
+    public DateTime EnrolmentDate { get; set; } = DateTime.Now;
 
-    public EnrollmentStatus Status { get; set; } = EnrollmentStatus.Enrolled;
+    public EnrolmentStatus Status { get; set; } = EnrolmentStatus.Enrolled;
 
     [Range(0, 100)]
     public decimal? Grade { get; set; }

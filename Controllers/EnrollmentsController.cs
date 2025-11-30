@@ -7,19 +7,22 @@ using UniversityPortal.Models;
 
 namespace UniversityPortal.Controllers;
 
-[Authorize(Roles = UserRoles.Student)]
+[Authorize]
 public class EnrollmentsController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
 
-    public EnrollmentsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    public EnrollmentsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
     {
         _context = context;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     // GET: Enrollments/MyEnrollments
+    [Authorize(Roles = UserRoles.Student)]
     public async Task<IActionResult> MyEnrollments()
     {
         var user = await _userManager.GetUserAsync(User);
@@ -29,7 +32,7 @@ public class EnrollmentsController : Controller
         }
 
         var student = await _context.Students
-            .Include(s => s.Enrollments)
+            .Include(s => s.Enrolments)
             .ThenInclude(e => e.Course)
             .FirstOrDefaultAsync(s => s.UserId == user.Id);
 
@@ -43,7 +46,6 @@ public class EnrollmentsController : Controller
     }
 
     // GET: Enrollments/CreateProfile
-    [AllowAnonymous]
     public IActionResult CreateProfile()
     {
         return View();
@@ -52,8 +54,7 @@ public class EnrollmentsController : Controller
     // POST: Enrollments/CreateProfile
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [AllowAnonymous]
-    public async Task<IActionResult> CreateProfile([Bind("FirstName,LastName,StudentNumber,DateOfBirth,Major")] Student student)
+    public async Task<IActionResult> CreateProfile([Bind("FirstName,LastName,StudentNumber,DateOfBirth,Programme")] Student student)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -71,7 +72,7 @@ public class EnrollmentsController : Controller
         if (ModelState.IsValid)
         {
             student.UserId = user.Id;
-            student.EnrollmentDate = DateTime.Now;
+            student.EnrolmentDate = DateTime.Now;
 
             _context.Add(student);
             await _context.SaveChangesAsync();
@@ -80,15 +81,19 @@ public class EnrollmentsController : Controller
             if (!await _userManager.IsInRoleAsync(user, UserRoles.Student))
             {
                 await _userManager.AddToRoleAsync(user, UserRoles.Student);
+                
+                // Refresh the sign-in to update the role claims
+                await _signInManager.RefreshSignInAsync(user);
             }
 
-            TempData["SuccessMessage"] = "Student profile created successfully! You can now enroll in courses.";
-            return RedirectToAction("Index", "Courses");
+            TempData["SuccessMessage"] = "Student profile created successfully! You can now enrol in courses.";
+            return RedirectToAction("Index", "Home");
         }
         return View(student);
     }
 
     // GET: Enrollments/Enroll?courseId=1
+    [Authorize(Roles = UserRoles.Student)]
     public async Task<IActionResult> Enroll(int? courseId)
     {
         if (courseId == null)
@@ -116,10 +121,10 @@ public class EnrollmentsController : Controller
         }
 
         // Check if already enrolled
-        var existingEnrollment = await _context.Enrollments
+        var existingEnrolment = await _context.Enrolments
             .FirstOrDefaultAsync(e => e.StudentId == student.Id && e.CourseId == courseId);
 
-        if (existingEnrollment != null)
+        if (existingEnrolment != null)
         {
             TempData["ErrorMessage"] = "You are already enrolled in this course.";
             return RedirectToAction("Details", "Courses", new { id = courseId });
@@ -140,6 +145,7 @@ public class EnrollmentsController : Controller
     // POST: Enrollments/Enroll
     [HttpPost, ActionName("Enroll")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = UserRoles.Student)]
     public async Task<IActionResult> EnrollConfirmed(int courseId)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -160,11 +166,11 @@ public class EnrollmentsController : Controller
             return NotFound();
         }
 
-        // Double-check enrollment constraints
-        var existingEnrollment = await _context.Enrollments
+        // Double-check enrolment constraints
+        var existingEnrolment = await _context.Enrolments
             .FirstOrDefaultAsync(e => e.StudentId == student.Id && e.CourseId == courseId);
 
-        if (existingEnrollment != null)
+        if (existingEnrolment != null)
         {
             TempData["ErrorMessage"] = "You are already enrolled in this course.";
             return RedirectToAction(nameof(MyEnrollments));
@@ -176,18 +182,18 @@ public class EnrollmentsController : Controller
             return RedirectToAction(nameof(MyEnrollments));
         }
 
-        // Create enrollment
-        var enrollment = new Enrollment
+        // Create enrolment
+        var enrolment = new Enrolment
         {
             StudentId = student.Id,
             CourseId = courseId,
-            EnrollmentDate = DateTime.Now,
-            Status = EnrollmentStatus.Enrolled
+            EnrolmentDate = DateTime.Now,
+            Status = EnrolmentStatus.Enrolled
         };
 
-        _context.Enrollments.Add(enrollment);
+        _context.Enrolments.Add(enrolment);
 
-        // Update course enrollment count
+        // Update course enrolment count
         course.CurrentEnrolled++;
         _context.Update(course);
 
@@ -200,6 +206,7 @@ public class EnrollmentsController : Controller
     // POST: Enrollments/Drop/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = UserRoles.Student)]
     public async Task<IActionResult> Drop(int id)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -214,26 +221,26 @@ public class EnrollmentsController : Controller
             return NotFound();
         }
 
-        var enrollment = await _context.Enrollments
+        var enrolment = await _context.Enrolments
             .Include(e => e.Course)
             .FirstOrDefaultAsync(e => e.Id == id && e.StudentId == student.Id);
 
-        if (enrollment == null)
+        if (enrolment == null)
         {
             return NotFound();
         }
 
-        // Update enrollment status
-        enrollment.Status = EnrollmentStatus.Dropped;
-        _context.Update(enrollment);
+        // Update enrolment status
+        enrolment.Status = EnrolmentStatus.Withdrawn;
+        _context.Update(enrolment);
 
-        // Decrease course enrollment count
-        enrollment.Course.CurrentEnrolled--;
-        _context.Update(enrollment.Course);
+        // Decrease course enrolment count
+        enrolment.Course.CurrentEnrolled--;
+        _context.Update(enrolment.Course);
 
         await _context.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = $"Successfully dropped {enrollment.Course.CourseCode}.";
+        TempData["SuccessMessage"] = $"Successfully withdrawn from {enrolment.Course.CourseCode}.";
         return RedirectToAction(nameof(MyEnrollments));
     }
 }

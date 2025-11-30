@@ -13,7 +13,7 @@ public class ApplicationDbContext : IdentityDbContext
 
     public DbSet<Course> Courses { get; set; }
     public DbSet<Student> Students { get; set; }
-    public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<Enrolment> Enrolments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,17 +26,17 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey(s => s.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Configure Enrollment-Student relationship
-        modelBuilder.Entity<Enrollment>()
+        // Configure Enrolment-Student relationship
+        modelBuilder.Entity<Enrolment>()
             .HasOne(e => e.Student)
-            .WithMany(s => s.Enrollments)
+            .WithMany(s => s.Enrolments)
             .HasForeignKey(e => e.StudentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Configure Enrollment-Course relationship
-        modelBuilder.Entity<Enrollment>()
+        // Configure Enrolment-Course relationship
+        modelBuilder.Entity<Enrolment>()
             .HasOne(e => e.Course)
-            .WithMany(c => c.Enrollments)
+            .WithMany(c => c.Enrolments)
             .HasForeignKey(e => e.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -50,8 +50,8 @@ public class ApplicationDbContext : IdentityDbContext
             .HasIndex(c => c.CourseCode)
             .IsUnique();
 
-        // Prevent duplicate enrollments (same student, same course)
-        modelBuilder.Entity<Enrollment>()
+        // Prevent duplicate enrolments (same student, same course)
+        modelBuilder.Entity<Enrolment>()
             .HasIndex(e => new { e.StudentId, e.CourseId })
             .IsUnique();
     }

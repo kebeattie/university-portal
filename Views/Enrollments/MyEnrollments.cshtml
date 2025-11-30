@@ -1,11 +1,11 @@
 @model UniversityPortal.Models.Student
 
 @{
-    ViewData["Title"] = "My Enrollments";
+    ViewData["Title"] = "My Enrolments";
 }
 
 <div class="container">
-    <h1>My Enrollments</h1>
+    <h1>My Enrolments</h1>
     <p class="lead">Welcome, @Model.FirstName @Model.LastName</p>
 
     @if (TempData["SuccessMessage"] != null)
@@ -30,16 +30,16 @@
                 <div class="card-body">
                     <h5 class="card-title">Student Information</h5>
                     <p><strong>Student Number:</strong> @Model.StudentNumber</p>
-                    <p><strong>Major:</strong> @Model.Major</p>
-                    <p><strong>Enrollment Date:</strong> @Model.EnrollmentDate.ToShortDateString()</p>
+                    <p><strong>Programme:</strong> @Model.Programme</p>
+                    <p><strong>Enrolment Date:</strong> @Model.EnrolmentDate.ToShortDateString()</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <h5 class="card-title">Total Enrollments</h5>
-                    <h2>@Model.Enrollments.Count(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled)</h2>
+                    <h5 class="card-title">Total Enrolments</h5>
+                    <h2>@Model.Enrolments.Count(e => e.Status == UniversityPortal.Models.EnrolmentStatus.Enrolled)</h2>
                 </div>
             </div>
         </div>
@@ -47,7 +47,7 @@
             <div class="card bg-success text-white">
                 <div class="card-body">
                     <h5 class="card-title">Total Credits</h5>
-                    <h2>@Model.Enrollments.Where(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled).Sum(e => e.Course.Credits)</h2>
+                    <h2>@Model.Enrolments.Where(e => e.Status == UniversityPortal.Models.EnrolmentStatus.Enrolled).Sum(e => e.Course.Credits)</h2>
                 </div>
             </div>
         </div>
@@ -60,10 +60,10 @@
         </div>
         <div class="card-body">
             @{
-                var activeEnrollments = Model.Enrollments.Where(e => e.Status == UniversityPortal.Models.EnrollmentStatus.Enrolled).ToList();
+                var activeEnrolments = Model.Enrolments.Where(e => e.Status == UniversityPortal.Models.EnrolmentStatus.Enrolled).ToList();
             }
 
-            @if (activeEnrollments.Any())
+            @if (activeEnrolments.Any())
             {
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -79,18 +79,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var enrollment in activeEnrollments)
+                            @foreach (var enrolment in activeEnrolments)
                             {
                                 <tr>
-                                    <td><strong>@enrollment.Course.CourseCode</strong></td>
-                                    <td>@enrollment.Course.CourseName</td>
-                                    <td>@enrollment.Course.Instructor</td>
-                                    <td>@enrollment.Course.Credits</td>
-                                    <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
+                                    <td><strong>@enrolment.Course.CourseCode</strong></td>
+                                    <td>@enrolment.Course.CourseName</td>
+                                    <td>@enrolment.Course.Instructor</td>
+                                    <td>@enrolment.Course.Credits</td>
+                                    <td>@enrolment.EnrolmentDate.ToShortDateString()</td>
                                     <td>
-                                        @if (enrollment.Grade.HasValue)
+                                        @if (enrolment.Grade.HasValue)
                                         {
-                                            <span class="badge bg-info">@enrollment.Grade.Value.ToString("F1")</span>
+                                            <span class="badge bg-info">@enrolment.Grade.Value.ToString("F1")</span>
                                         }
                                         else
                                         {
@@ -98,13 +98,13 @@
                                         }
                                     </td>
                                     <td>
-                                        <a asp-controller="Courses" asp-action="Details" asp-route-id="@enrollment.Course.Id" 
+                                        <a asp-controller="Courses" asp-action="Details" asp-route-id="@enrolment.Course.Id" 
                                            class="btn btn-sm btn-outline-primary">View</a>
-                                        <form asp-action="Drop" asp-route-id="@enrollment.Id" method="post" 
+                                        <form asp-action="Drop" asp-route-id="@enrolment.Id" method="post" 
                                               style="display:inline;" 
-                                              onsubmit="return confirm('Are you sure you want to drop this course?');">
+                                              onsubmit="return confirm('Are you sure you want to withdraw from this course?');">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-danger">Drop</button>
+                                            <button type="submit" class="btn btn-sm btn-danger">Withdraw</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -116,7 +116,7 @@
             else
             {
                 <div class="text-center py-5">
-                    <h4>No Active Enrollments</h4>
+                    <h4>No Active Enrolments</h4>
                     <p class="text-muted">You haven't enrolled in any courses yet.</p>
                     <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">Browse Available Courses</a>
                 </div>
@@ -125,14 +125,14 @@
     </div>
 
     @{
-        var pastEnrollments = Model.Enrollments.Where(e => e.Status != UniversityPortal.Models.EnrollmentStatus.Enrolled).ToList();
+        var pastEnrolments = Model.Enrolments.Where(e => e.Status != UniversityPortal.Models.EnrolmentStatus.Enrolled).ToList();
     }
 
-    @if (pastEnrollments.Any())
+    @if (pastEnrolments.Any())
     {
         <div class="card mt-4">
             <div class="card-header">
-                <h5 class="mb-0">Enrollment History</h5>
+                <h5 class="mb-0">Enrolment History</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -146,15 +146,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var enrollment in pastEnrollments)
+                            @foreach (var enrolment in pastEnrolments)
                             {
                                 <tr>
-                                    <td>@enrollment.Course.CourseCode - @enrollment.Course.CourseName</td>
+                                    <td>@enrolment.Course.CourseCode - @enrolment.Course.CourseName</td>
                                     <td>
-                                        <span class="badge bg-secondary">@enrollment.Status</span>
+                                        <span class="badge bg-secondary">@enrolment.Status</span>
                                     </td>
-                                    <td>@(enrollment.Grade?.ToString("F1") ?? "N/A")</td>
-                                    <td>@enrollment.EnrollmentDate.ToShortDateString()</td>
+                                    <td>@(enrolment.Grade?.ToString("F1") ?? "N/A")</td>
+                                    <td>@enrolment.EnrolmentDate.ToShortDateString()</td>
                                 </tr>
                             }
                         </tbody>

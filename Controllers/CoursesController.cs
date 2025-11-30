@@ -56,7 +56,7 @@ public class CoursesController : Controller
         }
 
         var course = await _context.Courses
-            .Include(c => c.Enrollments)
+            .Include(c => c.Enrolments)
             .ThenInclude(e => e.Student)
             .FirstOrDefaultAsync(m => m.Id == id);
 

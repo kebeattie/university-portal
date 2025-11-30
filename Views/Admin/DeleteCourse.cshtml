@@ -40,11 +40,11 @@
                 <dd class="col-sm-9">@(Model.IsActive ? "Active" : "Inactive")</dd>
             </dl>
 
-            @if (Model.Enrollments.Any())
+            @if (Model.Enrolments.Any())
             {
                 <div class="alert alert-warning">
-                    <strong>Note:</strong> This course has @Model.Enrollments.Count enrollment(s). 
-                    Deleting this course will also remove all associated enrollment records.
+                    <strong>Note:</strong> This course has @Model.Enrolments.Count enrolment(s). 
+                    Deleting this course will also remove all associated enrolment records.
                 </div>
             }
 
