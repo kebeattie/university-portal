@@ -1,7 +1,6 @@
 # Nixpacks configuration for Railway deployment
 [phases.setup]
-nixPkgs = ['...', 'sqlite']
-aptPkgs = ['...']
+nixPkgs = ['dotnet-sdk_8', 'sqlite']
 
 [phases.install]
 cmds = ['dotnet restore UniversityPortal.csproj']
@@ -11,6 +10,3 @@ cmds = ['dotnet publish UniversityPortal.csproj -c Release -o out']
 
 [start]
 cmd = 'cd out && dotnet UniversityPortal.dll --urls=http://0.0.0.0:$PORT'
-
-[variables]
-NIXPACKS_DOTNET_VERSION = '8.0'
